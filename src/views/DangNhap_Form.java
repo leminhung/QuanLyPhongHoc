@@ -20,15 +20,15 @@ public class DangNhap_Form extends javax.swing.JFrame {
 
     public DangNhap_Form() {
         initComponents();
-        
+
         Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/haui-logo.jpg"));
         setIconImage(image);
         this.getContentPane().setBackground(Color.white);
-        
+
         cbHinhThuc.addItem("Quản trị viên");
         cbHinhThuc.addItem("Giảng viên");
     }
-    
+
     public static String maNDHT;
 
     @SuppressWarnings("unchecked")
@@ -239,7 +239,7 @@ public class DangNhap_Form extends javax.swing.JFrame {
         GiaoVien giaovien = AccountService.getAccountByEmail(email, role);
         try {
             if (giaovien == null) {
-                throw new Exception("Tên tài khoản không tồn tại");
+                throw new Exception("Tài khoản không tồn tại");
             }
             if (!BCrypt.checkpw(password, giaovien.getPassword())) {
                 throw new Exception("Mật khẩu không chính xác");

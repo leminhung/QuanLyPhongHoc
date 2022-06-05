@@ -264,5 +264,26 @@ public class PhongService {
         }
         return dsmaphong;
     }
+    
+    public static ArrayList<Phong> getDsPhongTheoMaTang(String maTang) throws SQLException {
+        ArrayList<Phong> dsPhong = new ArrayList<>();
+        try {
+            Connection conn = ConnectionDB.ConnectionDB();
+            String sql = "select * from phong where maTang = '" + maTang + "'";
+
+            PreparedStatement statement = conn.prepareStatement(sql);
+            ResultSet result = statement.executeQuery();
+
+            while (result.next()) {
+                Phong p = new Phong();
+                p.setMaPhong(result.getString(1));
+                p.setTenPhong(result.getString(2));
+                dsPhong.add(p);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(PhongService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dsPhong;
+    }
 
 }

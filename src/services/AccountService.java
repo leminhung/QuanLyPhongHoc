@@ -85,7 +85,7 @@ public class AccountService {
 
         return 0;
     }
-    
+
     public static String getTenNDByMaND(String maND) {
 
         String sql = "SELECT tenND FROM qlphonghoc.nguoidung WHERE maND = '" + maND + "'";
@@ -102,9 +102,9 @@ public class AccountService {
         } catch (SQLException e) {
             System.out.println("Error:" + e.getMessage());
         }
-           return null;
+        return null;
     }
-    
+
     public static GiaoVien getAccountByEmail(String email, int role) {
 
         String sqlSelectUser = "SELECT * FROM qlphonghoc.nguoidung WHERE email = ? AND role = ?";
@@ -136,7 +136,38 @@ public class AccountService {
         }
         return giaovien;
     }
-    
+
+    public static GiaoVien getAccountByMaND(String maND) {
+
+        String sqlSelectUser = "SELECT * FROM qlphonghoc.nguoidung WHERE  maND = ?";
+        GiaoVien giaovien = null;
+        Connection conn = null;
+        try {
+
+            ConnectionDB connectDB = new ConnectionDB();
+            conn = connectDB.ConnectionDB();
+
+            PreparedStatement preparedStatement = conn.prepareStatement(sqlSelectUser);
+            preparedStatement.setString(1, maND);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                giaovien = new GiaoVien();
+                giaovien.setMaND(resultSet.getString("MaND"));
+                giaovien.setTenND(resultSet.getString("TenND"));
+                giaovien.setPassword(resultSet.getString("Password"));
+                giaovien.setEmail(resultSet.getString("Email"));
+                giaovien.setRole(resultSet.getInt("Role"));
+            }
+
+            preparedStatement.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return giaovien;
+    }
+
     public static boolean isEmailValid(String email) {
         final Pattern EMAIL_REGEX = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])", Pattern.CASE_INSENSITIVE);
         return EMAIL_REGEX.matcher(email).matches();

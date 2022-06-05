@@ -14,7 +14,7 @@ public class DangKy_Form extends javax.swing.JFrame {
 
     public DangKy_Form() {
         initComponents();
-        
+
         Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/haui-logo.jpg"));
         setIconImage(image);
         this.getContentPane().setBackground(Color.white);
@@ -36,6 +36,7 @@ public class DangKy_Form extends javax.swing.JFrame {
         magv_txt = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         tengv_txt = new javax.swing.JTextField();
+        quanlyphonghoc1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Đăng ký");
@@ -44,6 +45,7 @@ public class DangKy_Form extends javax.swing.JFrame {
         quanlyphonghoc.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         quanlyphonghoc.setText("Quản lý phòng học");
 
+        jLabel1.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
         jLabel1.setText("Email:");
 
         email_txt.setName("txt_email"); // NOI18N
@@ -65,6 +67,7 @@ public class DangKy_Form extends javax.swing.JFrame {
             }
         });
 
+        jLabel2.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
         jLabel2.setText("Mật khẩu:");
 
         btn_signup.setText("Đăng ký");
@@ -82,6 +85,7 @@ public class DangKy_Form extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
         jLabel3.setText("Mã GV:");
 
         magv_txt.setName("txt_magv"); // NOI18N
@@ -91,6 +95,7 @@ public class DangKy_Form extends javax.swing.JFrame {
             }
         });
 
+        jLabel4.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
         jLabel4.setText("Tên GV:");
 
         tengv_txt.setName("txt_tengv"); // NOI18N
@@ -104,6 +109,10 @@ public class DangKy_Form extends javax.swing.JFrame {
                 tengv_txtKeyPressed(evt);
             }
         });
+
+        quanlyphonghoc1.setFont(new java.awt.Font("Liberation Sans", 1, 18)); // NOI18N
+        quanlyphonghoc1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        quanlyphonghoc1.setText("Đăng ký");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -140,13 +149,19 @@ public class DangKy_Form extends javax.swing.JFrame {
                         .addGap(44, 44, 44)
                         .addComponent(pass_txt, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(95, 95, 95))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(quanlyphonghoc1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(172, 172, 172))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(13, 13, 13)
                 .addComponent(quanlyphonghoc, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(quanlyphonghoc1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(magv_txt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -189,20 +204,35 @@ public class DangKy_Form extends javax.swing.JFrame {
         String magv = magv_txt.getText();
         String tengv = tengv_txt.getText();
 
-        if (email.isEmpty() || password.isEmpty() || magv.isEmpty() || tengv.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Không được bỏ trống các trường dữ liệu!");
-        } else {
-            GiaoVien gv = new GiaoVien(magv, tengv, email, password);
-            AccountService.createAdminAccount(gv);
-            JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
-            
-            try {
-                DangNhap_Form.displaySignin();
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(DangKy_Form.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            if (email.isEmpty() || password.isEmpty() || magv.isEmpty() || tengv.isEmpty()) {
+                throw new Exception("Không được bỏ trống các trường dữ liệu!");
             }
-            
+
+            if (password.length() < 6) {
+                throw new Exception("Độ dài mật khẩu ít nhất 6 ký tự");
+            }
+
+            if (!AccountService.isEmailValid(email)) {
+                throw new Exception("Email không hợp lệ, hãy thử lại");
+            }
+
+            GiaoVien gv;
+            gv = AccountService.getAccountByMaND(magv);
+            if (gv != null) {
+                throw new Exception("Tài khoản đã tồn tại");
+            }
+
+            gv = new GiaoVien(magv, tengv, email, password);
+            AccountService.createAdminAccount(gv);
+
+            JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
+            DangNhap_Form.displaySignin();
+
             dispose();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage(), "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btn_signupActionPerformed
 
@@ -227,7 +257,7 @@ public class DangKy_Form extends javax.swing.JFrame {
     }//GEN-LAST:event_pass_txtKeyPressed
 
     public static void main(String args[]) throws ClassNotFoundException {
-        
+
         for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
             if ("Nimbus".equals(info.getName())) {
                 try {
@@ -242,7 +272,7 @@ public class DangKy_Form extends javax.swing.JFrame {
                 break;
             }
         }
-        
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new DangKy_Form().setVisible(true);
@@ -261,6 +291,7 @@ public class DangKy_Form extends javax.swing.JFrame {
     private javax.swing.JTextField magv_txt;
     private javax.swing.JTextField pass_txt;
     private javax.swing.JLabel quanlyphonghoc;
+    private javax.swing.JLabel quanlyphonghoc1;
     private javax.swing.JTextField tengv_txt;
     // End of variables declaration//GEN-END:variables
 }
